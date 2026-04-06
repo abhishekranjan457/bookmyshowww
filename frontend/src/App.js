@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import { movies, slots, seats } from "./data";
 import "./App.css";
 
+const API = "https://bookmyshow-backend-e8yy.onrender.com/api/booking";
+
 function App() {
   const [movie, setMovie] = useState("");
   const [slot, setSlot] = useState("");
@@ -9,7 +11,7 @@ function App() {
   const [lastBooking, setLastBooking] = useState(null);
 
   useEffect(() => {
-    fetch("/api/booking")
+    fetch(API)
       .then((res) => res.json())
       .then((data) => setLastBooking(data));
   }, []);
@@ -19,7 +21,7 @@ function App() {
   };
 
   const handleSubmit = () => {
-    fetch("/api/booking", {
+    fetch(API, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -40,7 +42,6 @@ function App() {
     <div className="container">
       <h2>Book that show!!</h2>
 
-      {/* MOVIE */}
       <div className="movie-row">
         <h3>Select A Movie</h3>
         {movies.map((m) => (
@@ -58,7 +59,6 @@ function App() {
         ))}
       </div>
 
-      {/* SLOT */}
       <div className="slot-row">
         <h3>Select a Time slot</h3>
         {slots.map((s) => (
@@ -74,7 +74,6 @@ function App() {
         ))}
       </div>
 
-      {/* SEATS */}
       <div className="seat-row">
         <h3>Select the seats</h3>
 
@@ -95,7 +94,6 @@ function App() {
         Book Now
       </button>
 
-      {/* LAST BOOKING */}
       <div className="last-booking">
         <h3>Last Booking Details:</h3>
 
