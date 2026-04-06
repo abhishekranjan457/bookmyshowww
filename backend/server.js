@@ -1,4 +1,3 @@
-
 const express = require("express");
 const cors = require("cors");
 
@@ -12,7 +11,9 @@ app.use(express.json());
 
 app.use("/api", bookingRoutes);
 
-app.listen(8080, async () => {
+const PORT = process.env.PORT || 8080;
+
+app.listen(PORT, async () => {
   await connect();
-  console.log("Server running on port 8080");
+  console.log("Server running on port", PORT);
 });
