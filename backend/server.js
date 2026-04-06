@@ -9,6 +9,10 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+app.get("/", (req, res) => {
+  res.send("BookMyShow backend running");
+});
+
 app.use("/api", bookingRoutes);
 
 const PORT = process.env.PORT || 8080;
