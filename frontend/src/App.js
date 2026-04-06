@@ -13,7 +13,8 @@ function App() {
   useEffect(() => {
     fetch(API)
       .then((res) => res.json())
-      .then((data) => setLastBooking(data));
+      .then((data) => setLastBooking(data))
+      .catch((err) => console.log(err));
   }, []);
 
   const handleSeat = (type, value) => {
@@ -31,11 +32,12 @@ function App() {
         slot,
         seats: seatData,
       }),
-    }).then((res) => {
-      if (res.status === 200) {
-        setLastBooking({ movie, slot, seats: seatData });
-      }
-    });
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        setLastBooking(data);
+      })
+      .catch((err) => console.log(err));
   };
 
   return (
