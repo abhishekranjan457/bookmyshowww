@@ -14,6 +14,11 @@ app.use("/api", bookingRoutes);
 const PORT = process.env.PORT || 8080;
 
 app.listen(PORT, async () => {
-  await connect();
-  console.log("Server running on port", PORT);
+  try {
+    await connect();
+    console.log("MongoDB connected");
+    console.log("Server running on port", PORT);
+  } catch (err) {
+    console.error("MongoDB connection error:", err);
+  }
 });
