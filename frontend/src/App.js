@@ -1,0 +1,123 @@
+import React, { useState, useEffect } from "react";
+import { movies, slots, seats } from "./data";
+import "./App.css";
+
+function App() {
+  const [movie, setMovie] = useState("");
+  const [slot, setSlot] = useState("");
+  const [seatData, setSeatData] = useState({});
+  const [lastBooking, setLastBooking] = useState(null);
+
+  useEffect(() => {
+    fetch("/api/booking")
+      .then((res) => res.json())
+      .then((data) => setLastBooking(data));
+  }, []);
+
+  const handleSeat = (type, value) => {
+    setSeatData({ ...seatData, [type]: Number(value) });
+  };
+
+  const handleSubmit = () => {
+    fetch("/api/booking", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        movie,
+        slot,
+        seats: seatData,
+      }),
+    }).then((res) => {
+      if (res.status === 200) {
+        setLastBooking({ movie, slot, seats: seatData });
+      }
+    });
+  };
+
+  return (
+    <div className="container">
+      <h2>Book that show!!</h2>
+
+      {/* MOVIE */}
+      <div className="movie-row">
+        <h3>Select A Movie</h3>
+        {movies.map((m) => (
+          <div
+            key={m}
+            className={
+              movie === m
+                ? "movie-column movie-column-selected"
+                : "movie-column"
+            }
+            onClick={() => setMovie(m)}
+          >
+            {m}
+          </div>
+        ))}
+      </div>
+
+      {/* SLOT */}
+      <div className="slot-row">
+        <h3>Select a Time slot</h3>
+        {slots.map((s) => (
+          <div
+            key={s}
+            className={
+              slot === s ? "slot-column slot-column-selected" : "slot-column"
+            }
+            onClick={() => setSlot(s)}
+          >
+            {s}
+          </div>
+        ))}
+      </div>
+
+      {/* SEATS */}
+      <div className="seat-row">
+        <h3>Select the seats</h3>
+
+        {seats.map((s) => (
+          <div key={s} className="seat-column">
+            <h4>Type {s}</h4>
+            <input
+              id={`seat-${s}`}
+              type="number"
+              min="0"
+              onChange={(e) => handleSeat(s, e.target.value)}
+            />
+          </div>
+        ))}
+      </div>
+
+      <button className="book-btn" onClick={handleSubmit}>
+        Book Now
+      </button>
+
+      {/* LAST BOOKING */}
+      <div className="last-booking">
+        <h3>Last Booking Details:</h3>
+
+        {lastBooking?.message ? (
+          <p>no previous booking found</p>
+        ) : (
+          lastBooking && (
+            <div>
+              <p>movie: {lastBooking.movie}</p>
+              <p>slot: {lastBooking.slot}</p>
+
+              {Object.entries(lastBooking.seats || {}).map(([k, v]) => (
+                <p key={k}>
+                  {k}: {v}
+                </p>
+              ))}
+            </div>
+          )
+        )}
+      </div>
+    </div>
+  );
+}
+
+export default App;
