@@ -1,4 +1,3 @@
-
 const mongoose = require("mongoose");
 
 const bookingSchema = new mongoose.Schema({
@@ -10,8 +9,8 @@ const bookingSchema = new mongoose.Schema({
     A3: Number,
     A4: Number,
     D1: Number,
-    D2: Number
-  }
+    D2: Number,
+  },
 });
 
-module.exports = mongoose.model("Booking", bookingSchema);
+module.exports = mongoose.model("booking", bookingSchema);
