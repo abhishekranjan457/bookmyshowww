@@ -13,16 +13,15 @@ function App() {
   useEffect(() => {
     fetch(API)
       .then((res) => res.json())
-      .then((data) => setLastBooking(data))
-      .catch((err) => console.log(err));
+      .then((data) => setLastBooking(data));
   }, []);
 
   const handleSeat = (type, value) => {
     setSeatData({ ...seatData, [type]: Number(value) });
   };
 
-  const handleSubmit = () => {
-    fetch(API, {
+  const handleSubmit = async () => {
+    await fetch(API, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -32,12 +31,11 @@ function App() {
         slot,
         seats: seatData,
       }),
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        setLastBooking(data);
-      })
-      .catch((err) => console.log(err));
+    });
+
+    const res = await fetch(API);
+    const data = await res.json();
+    setLastBooking(data);
   };
 
   return (
@@ -83,7 +81,6 @@ function App() {
           <div key={s} className="seat-column">
             <h4>Type {s}</h4>
             <input
-              id={`seat-${s}`}
               type="number"
               min="0"
               onChange={(e) => handleSeat(s, e.target.value)}
