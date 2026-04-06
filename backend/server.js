@@ -1,28 +1,135 @@
-const express = require("express");
-const cors = require("cors");
+import React, { useState, useEffect } from "react";
+import { movies, slots, seats } from "./data";
+import "./App.css";
 
-const connect = require("./connection");
-const bookingRoutes = require("./routes");
+const API = "https://bookmyshow-backend-e8yy.onrender.com/api/booking";
 
-const app = express();
+function App() {
+  const [movie, setMovie] = useState("");
+  const [slot, setSlot] = useState("");
+  const [seatData, setSeatData] = useState({});
+  const [lastBooking, setLastBooking] = useState(null);
 
-app.use(cors());
-app.use(express.json());
+  // get last booking
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const res = await fetch(API);
+        const data = await res.json();
+        setLastBooking(data);
+      } catch (err) {
+        console.log(err);
+      }
+    };
+    load();
+  }, []);
 
-app.get("/", (req, res) => {
-  res.send("BookMyShow backend running");
-});
+  const handleSeat = (type, value) => {
+    setSeatData({ ...seatData, [type]: Number(value) });
+  };
 
-app.use("/api", bookingRoutes);
+  const handleSubmit = async () => {
+    try {
+      const response = await fetch(API, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          movie,
+          slot,
+          seats: seatData,
+        }),
+      });
 
-const PORT = process.env.PORT || 8080;
+      const data = await response.json();
+      setLastBooking(data);
+    } catch (error) {
+      console.error("booking error:", error);
+    }
+  };
 
-app.listen(PORT, async () => {
-  try {
-    await connect();
-    console.log("MongoDB connected");
-    console.log("Server running on port", PORT);
-  } catch (err) {
-    console.error("MongoDB connection error:", err);
-  }
-});
+  return (
+    <div className="container">
+      <h2>Book that show!!</h2>
+
+      {/* MOVIES */}
+      <div className="movie-row">
+        <h3>Select A Movie</h3>
+        {movies.map((m) => (
+          <div
+            key={m}
+            className={
+              movie === m
+                ? "movie-column movie-column-selected"
+                : "movie-column"
+            }
+            onClick={() => setMovie(m)}
+          >
+            {m}
+          </div>
+        ))}
+      </div>
+
+      {/* SLOTS */}
+      <div className="slot-row">
+        <h3>Select a Time slot</h3>
+        {slots.map((s) => (
+          <div
+            key={s}
+            className={
+              slot === s ? "slot-column slot-column-selected" : "slot-column"
+            }
+            onClick={() => setSlot(s)}
+          >
+            {s}
+          </div>
+        ))}
+      </div>
+
+      {/* SEATS */}
+      <div className="seat-row">
+        <h3>Select the seats</h3>
+
+        {seats.map((s) => (
+          <div key={s} className="seat-column">
+            <h4>Type {s}</h4>
+            <input
+              type="number"
+              min="0"
+              onChange={(e) => handleSeat(s, e.target.value)}
+            />
+          </div>
+        ))}
+      </div>
+
+      <button className="book-btn" onClick={handleSubmit}>
+        Book Now
+      </button>
+
+      {/* LAST BOOKING */}
+      <div className="last-booking">
+        <h3>Last Booking Details:</h3>
+
+        {lastBooking?.message ? (
+          <p>no previous booking found</p>
+        ) : (
+          lastBooking && (
+            <div>
+              <p>movie: {lastBooking.movie}</p>
+              <p>slot: {lastBooking.slot}</p>
+
+              {Object.entries(lastBooking.seats || {}).map(([k, v]) => (
+                <p key={k}>
+                  {k}: {v}
+                </p>
+              ))}
+            </div>
+          )
+        )}
+      </div>
+    </div>
+  );
+}
+
+export default App;
