@@ -13,7 +13,8 @@ function App() {
   useEffect(() => {
     fetch(API)
       .then((res) => res.json())
-      .then((data) => setLastBooking(data));
+      .then((data) => setLastBooking(data))
+      .catch((err) => console.log(err));
   }, []);
 
   const handleSeat = (type, value) => {
@@ -21,21 +22,24 @@ function App() {
   };
 
   const handleSubmit = async () => {
-    await fetch(API, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        movie,
-        slot,
-        seats: seatData,
-      }),
-    });
+    try {
+      const response = await fetch(API, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          movie,
+          slot,
+          seats: seatData,
+        }),
+      });
 
-    const res = await fetch(API);
-    const data = await res.json();
-    setLastBooking(data);
+      const data = await response.json();
+      setLastBooking(data);
+    } catch (error) {
+      console.log("Booking error:", error);
+    }
   };
 
   return (
