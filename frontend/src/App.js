@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { movies, slots, seats } from "./data";
 import "./App.css";
 
-const API = "https://bookmyshow-backend-e8yy.onrender.com/api/booking";
+const API = "/api/booking";
 
 function App() {
   const [movie, setMovie] = useState("");
@@ -13,8 +13,7 @@ function App() {
   useEffect(() => {
     fetch(API)
       .then((res) => res.json())
-      .then((data) => setLastBooking(data))
-      .catch((err) => console.log(err));
+      .then((data) => setLastBooking(data));
   }, []);
 
   const handleSeat = (type, value) => {
@@ -22,24 +21,20 @@ function App() {
   };
 
   const handleSubmit = async () => {
-    try {
-      const response = await fetch(API, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          movie,
-          slot,
-          seats: seatData,
-        }),
-      });
+    const res = await fetch(API, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        movie,
+        slot,
+        seats: seatData,
+      }),
+    });
 
-      const data = await response.json();
-      setLastBooking(data);
-    } catch (error) {
-      console.log("Booking error:", error);
-    }
+    const data = await res.json();
+    setLastBooking(data);
   };
 
   return (
