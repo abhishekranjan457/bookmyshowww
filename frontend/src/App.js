@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { movies, slots, seats } from "./data";
 import "./App.css";
 
-const API = "/api/booking";
+const API = "https://bookmyshow-backend-e8yy.onrender.com/api/booking";
 
 function App() {
   const [movie, setMovie] = useState("");
@@ -13,7 +13,8 @@ function App() {
   useEffect(() => {
     fetch(API)
       .then((res) => res.json())
-      .then((data) => setLastBooking(data));
+      .then((data) => setLastBooking(data))
+      .catch(console.error);
   }, []);
 
   const handleSeat = (type, value) => {
@@ -21,20 +22,24 @@ function App() {
   };
 
   const handleSubmit = async () => {
-    const res = await fetch(API, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        movie,
-        slot,
-        seats: seatData,
-      }),
-    });
+    try {
+      const res = await fetch(API, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          movie,
+          slot,
+          seats: seatData,
+        }),
+      });
 
-    const data = await res.json();
-    setLastBooking(data);
+      const data = await res.json();
+      setLastBooking(data);
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   return (
@@ -75,7 +80,6 @@ function App() {
 
       <div className="seat-row">
         <h3>Select the seats</h3>
-
         {seats.map((s) => (
           <div key={s} className="seat-column">
             <h4>Type {s}</h4>
